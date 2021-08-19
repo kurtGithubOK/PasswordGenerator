@@ -35,15 +35,14 @@ function generatePassword() {
   // Provide at least one character from each selected criteria.
   for (let selectedCriterium of userInput.selectedCriteria) {
     const randomCharacter = getRandomCharacter(selectedCriterium)
-      password += randomCharacter;
+    password += randomCharacter;
   }
 
   // Fill in rest of pwd w/ random chars from criteria user picked.
-  for(let i=password.length ; i<userInput.numberOfCharacters ; i++) {
-      const randomCriteria = getRandomCriteria(userInput);
-      console.log('randomCriteria:', randomCriteria)
-      //   const character = getRandomCharacter(array);
-  //   password += character;
+  for (let i = password.length; i < userInput.numberOfCharacters; i++) {
+    const randomCriteriaCharacters = getRandomCriteria(userInput);
+    const randomCriteriaCharacter = getRandomCharacter(randomCriteriaCharacters);
+    password += randomCriteriaCharacter;
   }
   return password;
 }
@@ -51,6 +50,7 @@ function generatePassword() {
 // Display prompts to get user input.
 function getUserInput() {
   const numberOfCharacters = getNumberOfCharacters();
+  // If value is falsey then exit.
   if (!numberOfCharacters)
     return null;
 
@@ -94,9 +94,9 @@ function getRandomCriteria(userInput) {
   return userInput.selectedCriteria[randomIndex];
 }
 
-function getRandomCharacter(characters) {
-  const randomIndex = getRandomIndex(characters);
-  return characters[randomIndex]
+function getRandomCharacter(criteriaCharacters) {
+  const randomIndex = getRandomIndex(criteriaCharacters);
+  return criteriaCharacters[randomIndex]
 }
 
 function getRandomIndex(array) {
