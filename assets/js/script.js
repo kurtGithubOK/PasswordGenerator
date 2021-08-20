@@ -47,11 +47,17 @@ const passwordGenerator = {
     if (!numberOfCharacters)
       return null;
 
-    const userInput = { numberOfCharacters: numberOfCharacters };
+    let userInput = { numberOfCharacters: numberOfCharacters };
 
-    // Loop over character sets in library and get user's preference.
+    // Loop over password criteria and get user's preference.
     for (let passwordCriterium of this.passwordCriteria) {
       const passwordCriteriumCharacters = this.askAboutThisCriteria(passwordCriterium);
+      // Handle user cancelling and exiting.
+//      console.log(passwordCriteriumCharacters)
+      if(!passwordCriteriumCharacters) {
+        return;
+      }
+
       if (passwordCriteriumCharacters) {
         if (!userInput.selectedCriteria) { // Initialize array of selected characters for 1st time use.
           userInput.selectedCriteria = [];
@@ -65,6 +71,9 @@ const passwordGenerator = {
   // Prompt the user to enter number of characters.
   getNumberOfCharacters: function () {
     const numberOfCharacters = prompt('Enter number of characters, 8 to 128');
+    // Handle user cancelling.
+    if(!numberOfCharacters) return;
+  
     if (numberOfCharacters < 8 || numberOfCharacters > 128) {
       alert('Number of characters must be 8 to 128.');
       return;
@@ -76,8 +85,12 @@ const passwordGenerator = {
   askAboutThisCriteria: function (passwordCriterium) {
     const question = passwordCriterium.question;
     const userResponse = prompt(question);
+    const response1stChar = userResponse.toLowerCase().split('')[0];
+    // Handle user cancelling.
+    if(!userResponse) return;
+
     // Check for 'y' only.  Everything else is a no.
-    if (userResponse.toLowerCase().split('')[0] === 'y') {
+    if (response1stChar === 'y') {
       // If the user wants to include the character set, return it.
       return passwordCriterium.characters;
     }
