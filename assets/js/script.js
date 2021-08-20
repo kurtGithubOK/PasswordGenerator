@@ -14,28 +14,65 @@ function writePassword() {
 generateBtn.addEventListener("click", writePassword);
 
 
+
+
+// Homework Submission:
 const passwordGenerator = {
   // Main function.
-   generatePassword: function() {
+  generatePassword: function () {
     let password = '';
     // Prompt user for password specifics. 
     const userInput = this.getUserInput();
-    // If null, must be invalid num chars so return ''.
+
+    // If null, must be invalid num chars or exiting, so return ''.
     if (!userInput) {
       return password;
     }
-  
+
     // Provide at least one character from each selected criteria.
-    for (let selectedCriterium of userInput.selectedCriteria) {
-      const randomCharacter = this.getRandomCharacter(selectedCriterium)
+    password += this.fillMinimumCharacters(userInput);
+
+    // Fill in rest of pwd w/ random chars from criteria user picked.
+    password = this.fillRemainingCharacters(userInput, password);
+
+    return password;
+  },
+
+  // Provide at least one character from each selected criteria.
+  fillMinimumCharacters: function (userInput) {
+    let password = '';
+    for (let selectedCriteria of userInput.selectedCriteria) {
+      const myPasswordCriteria = this.passwordCriteria.find((elem) => elem.name === selectedCriteria);
+      const randomCharacter = this.getRandomCharacter(myPasswordCriteria.characters)
       password += randomCharacter;
     }
-  
-    // Fill in rest of pwd w/ random chars from criteria user picked.
+    return password;
+  },
+
+  // Fill in rest of pwd w/ random chars from criteria user picked.
+  fillRemainingCharacters: function (userInput, password) {
+    // Loop over remaining chars in password.
     for (let i = password.length; i < userInput.numberOfCharacters; i++) {
-      const randomCriteriaCharacters = this.getRandomCriteria(userInput);
-      const randomCriteriaCharacter = this.getRandomCharacter(randomCriteriaCharacters);
-      password += randomCriteriaCharacter;
+console.log('i', i)
+      // Get random criteria from userInput.
+      const randomCriteriaIndex = this.getRandomIndex(userInput.selectedCriteria)
+      console.log('randomCriteriaIndex', randomCriteriaIndex)
+
+      // Get list of characters from that criteria.
+      const myPasswordCriteria = this.passwordCriteria.find((elem) => elem.name === userInput.selectedCriteria[randomCriteriaIndex].name);
+      console.log('criteriaCharacters', myPasswordCriteria.characters)
+
+      // Get random index of those characters.
+      const randomCharacterIndex = this.getRandomIndex(myPasswordCriteria.characters);
+      console.log('randomCharacterIndex', randomCharacterIndex)
+
+      // Get random character.
+      const randomCharacter = criteriaCharacters[randomCharacterIndex];
+      console.log('randomCharacter', randomCharacter)
+
+      password += randomCharacter;
+      console.log('password now:', password)
+      console.log('');console.log('');console.log('');console.log('');
     }
     return password;
   },
@@ -51,19 +88,13 @@ const passwordGenerator = {
 
     // Loop over password criteria and get user's preference.
     for (let passwordCriterium of this.passwordCriteria) {
-      const passwordCriteriumCharacters = this.askAboutThisCriteria(passwordCriterium);
-      // Handle user cancelling and exiting.
-//      console.log(passwordCriteriumCharacters)
-      if(!passwordCriteriumCharacters) {
-        return;
+      const userResponse = this.askAboutThisCriteria(passwordCriterium);
+      if (!userResponse) return;
+      if (userResponse === 'n') continue;
+      if (!userInput.selectedCriteria) { // Initialize array of selected characters for 1st time use.
+        userInput.selectedCriteria = [];
       }
-
-      if (passwordCriteriumCharacters) {
-        if (!userInput.selectedCriteria) { // Initialize array of selected characters for 1st time use.
-          userInput.selectedCriteria = [];
-        }
-        userInput.selectedCriteria.push(passwordCriteriumCharacters);
-      }
+      userInput.selectedCriteria.push(userResponse);
     }
     return userInput;
   },
@@ -72,8 +103,8 @@ const passwordGenerator = {
   getNumberOfCharacters: function () {
     const numberOfCharacters = prompt('Enter number of characters, 8 to 128');
     // Handle user cancelling.
-    if(!numberOfCharacters) return;
-  
+    if (!numberOfCharacters) return;
+
     if (numberOfCharacters < 8 || numberOfCharacters > 128) {
       alert('Number of characters must be 8 to 128.');
       return;
@@ -85,15 +116,15 @@ const passwordGenerator = {
   askAboutThisCriteria: function (passwordCriterium) {
     const question = passwordCriterium.question;
     const userResponse = prompt(question);
-    const response1stChar = userResponse.toLowerCase().split('')[0];
-    // Handle user cancelling.
-    if(!userResponse) return;
 
-    // Check for 'y' only.  Everything else is a no.
-    if (response1stChar === 'y') {
-      // If the user wants to include the character set, return it.
-      return passwordCriterium.characters;
-    }
+    // Handle user cancelling.
+    if (!userResponse) return;
+
+    const response1stChar = userResponse.toLowerCase().split('')[0];
+    if (response1stChar === 'n') return 'n';
+
+    // Must be a yes.
+    return passwordCriterium.name;
   },
 
   // Utility methods for getting random values.
@@ -112,27 +143,23 @@ const passwordGenerator = {
   },
 
   // Keep data related to password criteria here.
-  passwordCriteria: [
-    {
-      name: 'uppercaseCharacters',
+  passwordCriteria: {
+    uppercaseCharacters: {
       question: 'Include uppercase characters?',
       characters: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
     },
-    {
-      name: 'lowercaseCharacters',
+    lowercaseCharacters: {
       question: 'Include lowercase characters?',
       characters: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
     },
-    {
-      name: 'specialCharacters',
+    specialCharacters: {
       question: 'Include special characters?',
       characters: [' ', '!', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~']
     },
-    {
-      name: 'numeric',
+    numeric: {
       question: 'Include numeric values?',
       characters: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     }
-  ]
+  }
 };
 
