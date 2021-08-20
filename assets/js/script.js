@@ -30,10 +30,10 @@ const passwordGenerator = {
     }
 
     // Provide at least one character from each selected criteria.
-    password += this.fillMinimumCharacters(userInput);
+    // password += this.fillMinimumCharacters(userInput);
 
-    // Fill in rest of pwd w/ random chars from criteria user picked.
-    password = this.fillRemainingCharacters(userInput, password);
+    // // Fill in rest of pwd w/ random chars from criteria user picked.
+    // password = this.fillRemainingCharacters(userInput, password);
 
     return password;
   },
@@ -53,7 +53,7 @@ const passwordGenerator = {
   fillRemainingCharacters: function (userInput, password) {
     // Loop over remaining chars in password.
     for (let i = password.length; i < userInput.numberOfCharacters; i++) {
-console.log('i', i)
+      console.log('i', i)
       // Get random criteria from userInput.
       const randomCriteriaIndex = this.getRandomIndex(userInput.selectedCriteria)
       console.log('randomCriteriaIndex', randomCriteriaIndex)
@@ -72,7 +72,7 @@ console.log('i', i)
 
       password += randomCharacter;
       console.log('password now:', password)
-      console.log('');console.log('');console.log('');console.log('');
+      console.log(''); console.log(''); console.log(''); console.log('');
     }
     return password;
   },
@@ -87,15 +87,23 @@ console.log('i', i)
     let userInput = { numberOfCharacters: numberOfCharacters };
 
     // Loop over password criteria and get user's preference.
-    for (let passwordCriterium of this.passwordCriteria) {
-      const userResponse = this.askAboutThisCriteria(passwordCriterium);
-      if (!userResponse) return;
-      if (userResponse === 'n') continue;
-      if (!userInput.selectedCriteria) { // Initialize array of selected characters for 1st time use.
-        userInput.selectedCriteria = [];
-      }
-      userInput.selectedCriteria.push(userResponse);
+    for (let passwordCriteriumKey of Object.keys(this.passwordCriteria)) {
+//      console.log('passwordCriteriumKey: ', passwordCriteriumKey)
+      const userResponse = this.askAboutThisCriteria(passwordCriteriumKey);
+      console.log('userResponse', userResponse)
+
+
     }
+
+    // for (let passwordCriterium of this.passwordCriteria) {
+    //   const userResponse = this.askAboutThisCriteria(passwordCriterium);
+    //   if (!userResponse) return;
+    //   if (userResponse === 'n') continue;
+    //   if (!userInput.selectedCriteria) { // Initialize array of selected characters for 1st time use.
+    //     userInput.selectedCriteria = [];
+    //   }
+    //   userInput.selectedCriteria.push(userResponse);
+    // }
     return userInput;
   },
 
@@ -113,8 +121,8 @@ console.log('i', i)
   },
 
   // Prompt the user to specify which password criteria to use.
-  askAboutThisCriteria: function (passwordCriterium) {
-    const question = passwordCriterium.question;
+  askAboutThisCriteria: function (passwordCriteriumKey) {
+    const question = this.passwordCriteria[passwordCriteriumKey].question;
     const userResponse = prompt(question);
 
     // Handle user cancelling.
@@ -124,7 +132,7 @@ console.log('i', i)
     if (response1stChar === 'n') return 'n';
 
     // Must be a yes.
-    return passwordCriterium.name;
+    return true;
   },
 
   // Utility methods for getting random values.
