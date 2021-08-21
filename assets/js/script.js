@@ -27,6 +27,9 @@ const passwordGenerator = {
     // If null, must be invalid num chars or exiting, so return ''.
     if (!userInput) {
       return password;
+    } else if(!userInput.selectedCriteria) {
+      alert('Passwords require at least one criteria.');
+      return password;
     }
 
     // Provide at least one character from each selected criteria.
@@ -92,8 +95,8 @@ const passwordGenerator = {
   // Prompt the user to enter number of characters.
   getNumberOfCharacters: function () {
     const numberOfCharacters = prompt('Enter number of characters, 8 to 128');
-    // Handle user cancelling.
-    if (!numberOfCharacters) return;
+    // Handle user cancelling or entering alpha values for quantity.
+    if (!numberOfCharacters || isNaN(numberOfCharacters)) return;
 
     if (numberOfCharacters < 8 || numberOfCharacters > 128) {
       alert('Number of characters must be 8 to 128.');
