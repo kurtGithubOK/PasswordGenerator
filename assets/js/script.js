@@ -30,10 +30,11 @@ const passwordGenerator = {
     }
 
     // Provide at least one character from each selected criteria.
-    // password += this.fillMinimumCharacters(userInput);
+    password = this.fillMinimumCharacters(userInput);
 
     // // Fill in rest of pwd w/ random chars from criteria user picked.
-    // password = this.fillRemainingCharacters(userInput, password);
+    const qtyOfCharacters = userInput.numberOfCharacters - userInput.selectedCriteria.length;
+    password += this.fillRemainingCharacters(userInput, qtyOfCharacters);
 
     return password;
   },
@@ -41,38 +42,26 @@ const passwordGenerator = {
   // Provide at least one character from each selected criteria.
   fillMinimumCharacters: function (userInput) {
     let password = '';
-    for (let selectedCriteria of userInput.selectedCriteria) {
-      const myPasswordCriteria = this.passwordCriteria.find((elem) => elem.name === selectedCriteria);
-      const randomCharacter = this.getRandomCharacter(myPasswordCriteria.characters)
+    for (let selectedCriterium of userInput.selectedCriteria) {
+      const myPasswordCriteria = this.passwordCriteria[selectedCriterium];
+      const randomCharacter = this.getRandomCharacter(myPasswordCriteria.characters);
       password += randomCharacter;
     }
     return password;
   },
 
   // Fill in rest of pwd w/ random chars from criteria user picked.
-  fillRemainingCharacters: function (userInput, password) {
+  fillRemainingCharacters: function (userInput, qtyOfCharacters) {
+    let password = '';
     // Loop over remaining chars in password.
-    for (let i = password.length; i < userInput.numberOfCharacters; i++) {
-      console.log('i', i)
-      // Get random criteria from userInput.
+    for (let i = 0; i < qtyOfCharacters; i++) {
+      // Get random criteria.
       const randomCriteriaIndex = this.getRandomIndex(userInput.selectedCriteria)
-      console.log('randomCriteriaIndex', randomCriteriaIndex)
-
-      // Get list of characters from that criteria.
-      const myPasswordCriteria = this.passwordCriteria.find((elem) => elem.name === userInput.selectedCriteria[randomCriteriaIndex].name);
-      console.log('criteriaCharacters', myPasswordCriteria.characters)
-
-      // Get random index of those characters.
-      const randomCharacterIndex = this.getRandomIndex(myPasswordCriteria.characters);
-      console.log('randomCharacterIndex', randomCharacterIndex)
-
-      // Get random character.
-      const randomCharacter = criteriaCharacters[randomCharacterIndex];
-      console.log('randomCharacter', randomCharacter)
-
+      const randomCriteriumKey = userInput.selectedCriteria[randomCriteriaIndex];
+      const randomCriterium = this.passwordCriteria[randomCriteriumKey];
+      // Get a character from that criteria.
+      const randomCharacter = this.getRandomCharacter(randomCriterium.characters);
       password += randomCharacter;
-      console.log('password now:', password)
-      console.log(''); console.log(''); console.log(''); console.log('');
     }
     return password;
   },
@@ -88,22 +77,15 @@ const passwordGenerator = {
 
     // Loop over password criteria and get user's preference.
     for (let passwordCriteriumKey of Object.keys(this.passwordCriteria)) {
-//      console.log('passwordCriteriumKey: ', passwordCriteriumKey)
       const userResponse = this.askAboutThisCriteria(passwordCriteriumKey);
-      console.log('userResponse', userResponse)
-
-
+      if (!userResponse) return;
+      if (userResponse === 'n') continue;
+      // If yes, then put it in selectedCriteria.
+      if (!userInput.selectedCriteria) { // Initialize array of selected characters for 1st time use.
+        userInput.selectedCriteria = [];
+      }
+      userInput.selectedCriteria.push(passwordCriteriumKey);
     }
-
-    // for (let passwordCriterium of this.passwordCriteria) {
-    //   const userResponse = this.askAboutThisCriteria(passwordCriterium);
-    //   if (!userResponse) return;
-    //   if (userResponse === 'n') continue;
-    //   if (!userInput.selectedCriteria) { // Initialize array of selected characters for 1st time use.
-    //     userInput.selectedCriteria = [];
-    //   }
-    //   userInput.selectedCriteria.push(userResponse);
-    // }
     return userInput;
   },
 
